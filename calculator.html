@@ -173,6 +173,37 @@
     margin-bottom: 6px;
   }
   #perPerson { font-size: 40px; font-weight: bold; text-align: right; min-height: 52px; }
+
+  /* ===== 計算歷史紀錄 ===== */
+  .history { margin-top: 20px; }
+  .history-header {          /* 標題和「清除紀錄」按鈕排在同一列 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .history-title { font-size: 22px; font-weight: bold; color: #333; }
+  .history-clear {           /* 清除紀錄按鈕：淺紅色 */
+    font-size: 18px;
+    padding: 10px 16px;
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  #historyList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #historyList li {          /* 每一筆紀錄 */
+    font-size: 20px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: right;
+    word-break: break-all;
+    color: #374151;
+  }
+  #historyList li b { color: #111; font-size: 24px; }   /* 結果數字加粗 */
+  #historyList li.empty { text-align: center; color: #9ca3af; }   /* 沒有紀錄時的提示 */
 </style>
 </head>
 <body>
@@ -219,6 +250,15 @@
 
       <button class="wide" data-value="0">0</button>
       <button data-value=".">.</button>
+    </div>
+
+    <!-- 計算歷史紀錄：最新的在最上面，最多 10 筆 -->
+    <div class="history">
+      <div class="history-header">
+        <span class="history-title">計算歷史紀錄</span>
+        <button class="history-clear" id="clearHistoryBtn">清除紀錄</button>
+      </div>
+      <ul id="historyList"></ul>
     </div>
   </div>
 
@@ -427,8 +467,10 @@
     try {
       const answer = calculate(expression);
       if (isNaN(answer)) throw new Error("算式不完整");
+      const answerText = String(answer).replace("-", "−");
+      addHistory(expression, answerText);   // 算成功才加入歷史紀錄
       expression += " =";
-      updateDisplay(String(answer).replace("-", "−"));
+      updateDisplay(answerText);
     } catch (err) {
       expression += " =";
       updateDisplay("錯誤");
@@ -444,8 +486,46 @@
     updateDisplay("0");
   }
 
-  // ===== 幫計算機頁的按鈕綁定點擊事件（只選計算機頁裡的按鈕） =====
-  document.querySelectorAll("#calcPage button").forEach(function (btn) {
+  // ===== 計算歷史紀錄 =====
+  const historyListEl = document.getElementById("historyList");
+  const MAX_HISTORY = 10;      // 最多保留 10 筆
+  let history = [];            // 每一筆是 { expr: "12+3", result: "15" }
+
+  // 新增一筆紀錄：放在最前面，超過 10 筆就把最舊的刪掉
+  function addHistory(expr, result) {
+    history.unshift({ expr: expr, result: result });
+    if (history.length > MAX_HISTORY) history.pop();
+    renderHistory();
+  }
+
+  // 把紀錄畫到畫面上
+  function renderHistory() {
+    historyListEl.innerHTML = "";
+    if (history.length === 0) {
+      historyListEl.innerHTML = '<li class="empty">目前沒有紀錄</li>';
+      return;
+    }
+    history.forEach(function (item) {
+      const li = document.createElement("li");
+      // 用 textContent 放算式，避免把文字當成 HTML 執行
+      li.textContent = item.expr + " = ";
+      const b = document.createElement("b");
+      b.textContent = item.result;
+      li.appendChild(b);
+      historyListEl.appendChild(li);
+    });
+  }
+
+  // 「清除紀錄」按鈕：只清歷史，不影響目前的算式
+  document.getElementById("clearHistoryBtn").addEventListener("click", function () {
+    history = [];
+    renderHistory();
+  });
+
+  renderHistory();   // 一開始先顯示「目前沒有紀錄」
+
+  // ===== 幫計算機按鍵綁定點擊事件（只選按鍵區 .buttons 裡的按鈕，不含清除紀錄） =====
+  document.querySelectorAll("#calcPage .buttons button").forEach(function (btn) {
     btn.addEventListener("click", function () {
       const action = btn.dataset.action;
       if (action === "clear") pressClear();
