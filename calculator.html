@@ -554,13 +554,27 @@
     });
   });
 
+  // ===== 記住最後是用滑鼠還是 Tab 移動焦點（判斷 Enter 要做什麼） =====
+  let focusedByPointer = false;
+  document.addEventListener("pointerdown", function () {
+    focusedByPointer = true;
+  });
+
   // ===== 鍵盤操作：只在「計算機」分頁時才有作用 =====
   document.addEventListener("keydown", function (e) {
+    if (e.key === "Tab") focusedByPointer = false;
     if (currentPage !== "calcPage") return;   // 在換算頁打字時不要干擾輸入框
     const keyMap = { "+": "+", "-": "−", "*": "×", "/": "÷", ".": "." };
     if (e.key >= "0" && e.key <= "9") inputValue(e.key);
     else if (keyMap[e.key]) inputValue(keyMap[e.key]);
-    else if (e.key === "Enter" || e.key === "=") pressEqual();
+    else if (e.key === "Enter" || e.key === "=") {
+      // Enter 只做一件事，避免同時算出答案又觸發焦點所在的按鈕
+      if (e.key === "Enter" && document.activeElement.tagName === "BUTTON") {
+        if (!focusedByPointer) return;   // 用 Tab 移到按鈕：只觸發那顆按鈕
+        e.preventDefault();              // 滑鼠點過按鈕：只算出答案，不再按一次
+      }
+      pressEqual();
+    }
     else if (e.key === "Escape" || e.key === "Backspace") pressClear();
   });
 
