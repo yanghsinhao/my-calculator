@@ -2,79 +2,70 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>計算機與單位換算</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>多功能計算機</title>
 <style>
-  /* ===== 整體版面：置中、背景色 ===== */
+  /* 整體頁面：置中、柔和背景 */
   body {
     margin: 0;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     background: #eef2f7;
-    font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
   }
 
-  /* ===== 外框 ===== */
-  .calculator {
-    width: 100%;
-    max-width: 400px;
-    margin: 16px;
+  /* 計算機外框 */
+  .calc {
+    width: 340px;
     padding: 20px;
     background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    box-sizing: border-box;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   }
 
-  /* ===== 分頁按鈕（計算機／單位換算） ===== */
+  .title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #333;
+  }
+
+  /* ===== 分頁切換列 ===== */
   .tabs {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);   /* 三個分頁平均排 */
-    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
     margin-bottom: 16px;
   }
-  .tab {
-    font-size: 20px;
-    padding: 14px 0;
-    background: #e5e7eb;
-    color: #555;
-  }
-  .tab.active {              /* 目前選中的分頁：藍色 */
-    background: #3b82f6;
-    color: #fff;
-  }
-  .page { display: none; }        /* 分頁內容預設隱藏 */
-  .page.active { display: block; } /* 只顯示選中的那一頁 */
 
-  /* ===== 上方顯示區 ===== */
-  .display {
+  /* 顯示區：上面是算式，下面是結果 */
+  .screen {
     background: #1f2937;
-    color: #fff;
-    border-radius: 14px;
-    padding: 16px;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 12px 16px;
     margin-bottom: 16px;
     text-align: right;
-    word-break: break-all;   /* 數字太長時自動換行 */
+    min-height: 90px;
+    overflow: hidden;
   }
-  .display .label {
-    font-size: 16px;
+  .expression {
+    font-size: 24px;
     color: #9ca3af;
-    text-align: left;
+    min-height: 32px;
+    word-break: break-all;
   }
-  #expression {          /* 算式 */
-    font-size: 26px;
-    min-height: 36px;
-    color: #d1d5db;
-  }
-  #result {              /* 結果 */
+  .result {
     font-size: 44px;
     font-weight: bold;
-    min-height: 56px;
+    margin-top: 6px;
+    word-break: break-all;
   }
 
-  /* ===== 按鈕排列：4 欄格線 ===== */
+  /* 按鈕排列：4 欄格線 */
   .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -82,582 +73,523 @@
   }
 
   button {
+    height: 68px;
     font-size: 30px;
     font-weight: bold;
-    padding: 18px 0;
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     cursor: pointer;
     background: #e5e7eb;
-    color: #111;
-    font-family: inherit;
+    color: #111827;
+    transition: transform 0.05s, filter 0.15s;
   }
-  button:active { transform: scale(0.95); }   /* 按下時縮小一點，有回饋感 */
+  button:hover  { filter: brightness(0.95); }
+  button:active { transform: scale(0.95); }
 
-  .op    { background: #fbbf24; }             /* 運算符號：黃色 */
-  .clear { background: #f87171; color: #fff; font-size: 24px; } /* 清除：紅色 */
-  .equal { background: #34d399; color: #fff; } /* 等於：綠色 */
-  .wide  { grid-column: span 2; }             /* 佔兩格寬 */
+  /* 運算符號、清除、等於使用不同顏色，方便辨識 */
+  .op    { background: #f59e0b; color: #ffffff; }
+  .clear { background: #ef4444; color: #ffffff; }
+  .equal { background: #10b981; color: #ffffff; }
 
-  /* ===== 單位換算頁 ===== */
-  .category-buttons {        /* 重量／面積／匯率 三個類別按鈕 */
+  /* 清除按鈕佔 2 欄、等於按鈕佔 2 欄 */
+  .wide { grid-column: span 2; }
+
+  /* ===== 分頁按鈕（計算機／單位換算、重量／面積／匯率）===== */
+  .tab {
+    height: 56px;
+    font-size: 24px;
+  }
+  .tab.active {
+    background: #3b82f6;
+    color: #ffffff;
+  }
+
+  /* ===== 單位換算頁面 ===== */
+  .cats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 10px;
     margin-bottom: 16px;
   }
-  .category { font-size: 22px; padding: 14px 0; }
-  .category.active { background: #fbbf24; }   /* 選中的類別：黃色 */
-
-  .field-label {
-    display: block;
-    font-size: 20px;
+  .label {
+    font-size: 22px;
     font-weight: bold;
-    color: #333;
+    color: #374151;
     margin: 12px 0 6px;
   }
-  input, select {
+  /* 數字輸入框與下拉選單：字體放大，方便閱讀 */
+  .field {
     width: 100%;
-    font-size: 26px;
-    padding: 12px;
+    box-sizing: border-box;
+    height: 60px;
+    font-size: 28px;
+    padding: 0 12px;
     border: 2px solid #d1d5db;
     border-radius: 12px;
-    box-sizing: border-box;
-    font-family: inherit;
-    background: #fff;
+    background: #ffffff;
+    color: #111827;
   }
-  input:focus, select:focus { outline: none; border-color: #3b82f6; }
-
-  .swap {                    /* 對調單位按鈕 */
+  .field:focus { outline: none; border-color: #3b82f6; }
+  .swap {
     width: 100%;
-    font-size: 22px;
-    padding: 10px 0;
-    margin-top: 12px;
-    background: #dbeafe;
-    color: #1d4ed8;
+    margin-top: 14px;
+    height: 56px;
+    font-size: 24px;
+    background: #f59e0b;
+    color: #ffffff;
   }
-  .convert-btn { width: 100%; margin-top: 16px; }
+  /* 換算結果顯示區：同時顯示「換算前」與「換算後」 */
+  .conv-screen {
+    background: #1f2937;
+    color: #ffffff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 16px;
+  }
+  .conv-row { margin: 6px 0; }
+  .conv-tag {
+    font-size: 20px;
+    color: #9ca3af;
+  }
+  .conv-value {
+    font-size: 36px;
+    font-weight: bold;
+    word-break: break-all;
+  }
+  .conv-unit {
+    font-size: 26px;
+    color: #fbbf24;
+    margin-left: 6px;
+  }
+  .rate-note {
+    font-size: 18px;
+    color: #b45309;
+    margin-top: 12px;
+    text-align: center;
+  }
 
-  /* 換算結果區 */
-  .convert-result { margin-top: 16px; text-align: left; }
-  #convertBefore { font-size: 24px; color: #d1d5db; min-height: 32px; }
-  #convertAfter  { font-size: 36px; font-weight: bold; min-height: 48px; }
-  .note { font-size: 15px; color: #6b7280; margin-top: 10px; text-align: center; }
-
-  /* ===== 聚餐分帳頁 ===== */
-  .service-row {             /* 「加一成服務費」勾選框整列 */
+  /* ===== 計算歷史紀錄 ===== */
+  .history {
+    margin-top: 16px;
+    border-top: 2px solid #e5e7eb;
+    padding-top: 12px;
+  }
+  .history-head {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .history-title {
     font-size: 22px;
     font-weight: bold;
-    color: #333;
-    margin-top: 18px;
-    padding: 14px;
-    background: #f3f4f6;
-    border-radius: 12px;
-    cursor: pointer;
+    color: #374151;
   }
-  .service-row input {       /* 把勾選框放大，方便點 */
-    width: 30px;
-    height: 30px;
-    margin: 0;
-    cursor: pointer;
-  }
-  .split-result { margin-top: 16px; text-align: left; }
-  .split-line {              /* 明細：左邊項目、右邊金額 */
-    display: flex;
-    justify-content: space-between;
+  /* 清除紀錄按鈕：比一般按鈕小一點，但字仍然清楚 */
+  .history-clear {
+    height: 44px;
+    padding: 0 16px;
     font-size: 20px;
-    color: #d1d5db;
-    margin-bottom: 6px;
+    background: #ef4444;
+    color: #ffffff;
   }
-  #perPerson { font-size: 40px; font-weight: bold; text-align: right; min-height: 52px; }
+  .history-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 260px;      /* 最多 10 筆，超過高度就可捲動 */
+    overflow-y: auto;
+  }
+  .history-item {
+    background: #f3f4f6;
+    border-radius: 10px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    text-align: right;
+    word-break: break-all;
+  }
+  .history-expr   { font-size: 20px; color: #6b7280; }
+  .history-result { font-size: 28px; font-weight: bold; color: #111827; }
+  .history-empty {
+    font-size: 20px;
+    color: #9ca3af;
+    text-align: center;
+    padding: 12px 0;
+  }
+
+  /* 目前沒被選到的分頁先隱藏 */
+  .hidden { display: none; }
 </style>
 </head>
 <body>
 
-<div class="calculator">
+<div class="calc">
+  <div class="title">多功能計算機</div>
 
-  <!-- ===== 分頁切換按鈕 ===== -->
+  <!-- 分頁切換列 -->
   <div class="tabs">
-    <button class="tab active" data-page="calcPage">計算機</button>
-    <button class="tab" data-page="convertPage">單位換算</button>
-    <button class="tab" data-page="splitPage">聚餐分帳</button>
+    <button class="tab active" id="tabCalc" onclick="showTab('calc')">計算機</button>
+    <button class="tab" id="tabConv" onclick="showTab('conv')">單位換算</button>
   </div>
 
-  <!-- ================= 第 1 頁：計算機（原本功能） ================= -->
-  <div class="page active" id="calcPage">
-    <!-- 顯示區：上面是算式，下面是結果 -->
-    <div class="display">
-      <div class="label">算式</div>
-      <div id="expression"></div>
-      <div class="label">結果</div>
-      <div id="result">0</div>
+  <!-- ========== 分頁一：四則運算計算機（原本功能，完整保留）========== -->
+  <div id="pageCalc">
+    <!-- 顯示區 -->
+    <div class="screen">
+      <div class="expression" id="expression"></div>
+      <div class="result" id="result">0</div>
     </div>
 
-    <!-- 按鈕區：data-value 存放按鈕代表的字元 -->
+    <!-- 按鈕區 -->
     <div class="buttons">
-      <button class="clear wide" data-action="clear">清除 C</button>
-      <button class="op" data-value="÷">÷</button>
-      <button class="op" data-value="×">×</button>
+      <button onclick="pressNumber('7')">7</button>
+      <button onclick="pressNumber('8')">8</button>
+      <button onclick="pressNumber('9')">9</button>
+      <button class="op" onclick="pressOperator('÷')">÷</button>
 
-      <button data-value="7">7</button>
-      <button data-value="8">8</button>
-      <button data-value="9">9</button>
-      <button class="op" data-value="−">−</button>
+      <button onclick="pressNumber('4')">4</button>
+      <button onclick="pressNumber('5')">5</button>
+      <button onclick="pressNumber('6')">6</button>
+      <button class="op" onclick="pressOperator('×')">×</button>
 
-      <button data-value="4">4</button>
-      <button data-value="5">5</button>
-      <button data-value="6">6</button>
-      <button class="op" data-value="+">+</button>
+      <button onclick="pressNumber('1')">1</button>
+      <button onclick="pressNumber('2')">2</button>
+      <button onclick="pressNumber('3')">3</button>
+      <button class="op" onclick="pressOperator('－')">－</button>
 
-      <button data-value="1">1</button>
-      <button data-value="2">2</button>
-      <button data-value="3">3</button>
-      <button class="equal" data-action="equal" style="grid-row: span 2;">=</button>
+      <button onclick="pressNumber('0')">0</button>
+      <button class="clear" onclick="clearAll()">清除</button>
+      <button class="op" onclick="pressOperator('＋')">＋</button>
 
-      <button class="wide" data-value="0">0</button>
-      <button data-value=".">.</button>
+      <button class="equal wide" style="grid-column: span 4;" onclick="calculate()">＝ 等於</button>
+    </div>
+
+    <!-- 計算歷史紀錄：最新的一筆在最上面，最多 10 筆 -->
+    <div class="history">
+      <div class="history-head">
+        <div class="history-title">計算紀錄</div>
+        <button class="history-clear" onclick="clearHistory()">清除紀錄</button>
+      </div>
+      <ul class="history-list" id="historyList"></ul>
     </div>
   </div>
 
-  <!-- ================= 第 2 頁：單位換算 ================= -->
-  <div class="page" id="convertPage">
-    <!-- 類別選擇 -->
-    <div class="category-buttons">
-      <button class="category active" data-category="weight">重量</button>
-      <button class="category" data-category="area">面積</button>
-      <button class="category" data-category="currency">匯率</button>
+  <!-- ========== 分頁二：單位換算 ========== -->
+  <div id="pageConv" class="hidden">
+    <!-- 換算類別：重量／面積／匯率 -->
+    <div class="cats">
+      <button class="tab active" id="cat-weight" onclick="setCategory('weight')">重量</button>
+      <button class="tab" id="cat-area" onclick="setCategory('area')">面積</button>
+      <button class="tab" id="cat-money" onclick="setCategory('money')">匯率</button>
     </div>
 
-    <label class="field-label" for="amount">輸入數值</label>
-    <input id="amount" type="number" inputmode="decimal" value="1">
+    <div class="label">輸入數值</div>
+    <input class="field" id="amount" type="number" inputmode="decimal" value="1" oninput="convert()">
 
-    <label class="field-label" for="fromUnit">換算前單位</label>
-    <select id="fromUnit"></select>
+    <div class="label">從（換算前單位）</div>
+    <select class="field" id="fromUnit" onchange="convert()"></select>
 
-    <button class="swap" id="swapBtn">⇅ 對調單位</button>
+    <div class="label">換成（換算後單位）</div>
+    <select class="field" id="toUnit" onchange="convert()"></select>
 
-    <label class="field-label" for="toUnit">換算後單位</label>
-    <select id="toUnit"></select>
+    <button class="swap" onclick="swapUnits()">⇅ 互換單位</button>
 
-    <button class="equal convert-btn" id="convertBtn">換算</button>
-
-    <!-- 換算結果：同時顯示換算前與換算後的單位名稱 -->
-    <div class="display convert-result">
-      <div class="label">換算前</div>
-      <div id="convertBefore"></div>
-      <div class="label">換算後</div>
-      <div id="convertAfter"></div>
+    <!-- 結果區：同時顯示換算前與換算後 -->
+    <div class="conv-screen">
+      <div class="conv-row">
+        <div class="conv-tag">換算前</div>
+        <span class="conv-value" id="beforeValue">1</span><span class="conv-unit" id="beforeUnit"></span>
+      </div>
+      <div class="conv-row">
+        <div class="conv-tag">換算後</div>
+        <span class="conv-value" id="afterValue">0</span><span class="conv-unit" id="afterUnit"></span>
+      </div>
     </div>
-    <div class="note" id="convertNote"></div>
-  </div>
-
-  <!-- ================= 第 3 頁：聚餐分帳 ================= -->
-  <div class="page" id="splitPage">
-    <label class="field-label" for="billTotal">總金額（元）</label>
-    <input id="billTotal" type="number" inputmode="decimal" min="0" placeholder="例如 3580">
-
-    <label class="field-label" for="peopleCount">人數</label>
-    <input id="peopleCount" type="number" inputmode="numeric" min="1" step="1" placeholder="例如 4">
-
-    <!-- 勾選後會多加 10% 服務費 -->
-    <label class="service-row">
-      <input type="checkbox" id="serviceFee">
-      加一成服務費（10%）
-    </label>
-
-    <button class="equal convert-btn" id="splitBtn">計算分帳</button>
-
-    <!-- 分帳結果 -->
-    <div class="display split-result">
-      <div class="split-line"><span>餐費</span><span id="subtotalText">—</span></div>
-      <div class="split-line"><span>服務費</span><span id="feeText">—</span></div>
-      <div class="split-line"><span>應付總額</span><span id="grandText">—</span></div>
-      <div class="label">每人要付</div>
-      <div id="perPerson">—</div>
-    </div>
-    <div class="note" id="splitNote">每人金額無條件進位到元</div>
+    <!-- 只在「匯率」類別顯示的提醒 -->
+    <div class="rate-note hidden" id="rateNote">※ 匯率為練習用示範數值，實際請以銀行公告為準</div>
   </div>
 </div>
 
 <script>
-  /* =====================================================
-     第一部分：分頁切換
-     ===================================================== */
-  let currentPage = "calcPage";   // 記住目前在哪一頁（給鍵盤功能判斷用）
+  // ===== 分頁切換：計算機／單位換算 =====
+  function showTab(name) {
+    const isCalc = (name === "calc");
+    document.getElementById("pageCalc").classList.toggle("hidden", !isCalc);
+    document.getElementById("pageConv").classList.toggle("hidden", isCalc);
+    document.getElementById("tabCalc").classList.toggle("active", isCalc);
+    document.getElementById("tabConv").classList.toggle("active", !isCalc);
+  }
 
-  document.querySelectorAll(".tab").forEach(function (tab) {
-    tab.addEventListener("click", function () {
-      // 先把所有分頁按鈕和內容都設為「未選中」
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-      // 再把被點的那一個設為「選中」
-      tab.classList.add("active");
-      currentPage = tab.dataset.page;
-      document.getElementById(currentPage).classList.add("active");
-    });
-  });
+  // ==================================================
+  //  分頁一：四則運算計算機（程式與原本相同）
+  // ==================================================
 
-  /* =====================================================
-     第二部分：計算機（原本的功能，沒有改動邏輯）
-     ===================================================== */
-  // ===== 取得畫面上的元素 =====
+  // ===== 狀態變數 =====
+  let expression = "";    // 目前輸入的算式，例如 "12＋3×4"
+  let justCalculated = false; // 是否剛按過等於（用來決定下一次輸入要不要重新開始）
+
   const expressionEl = document.getElementById("expression");
   const resultEl = document.getElementById("result");
 
-  // 目前輸入中的算式（字串），例如 "12+3×4"
-  let expression = "";
-  // 是否剛按完「=」：如果是，下一次輸入數字會重新開始
-  let justCalculated = false;
+  // 判斷最後一個字元是不是運算符號
+  function endsWithOperator() {
+    return /[＋－×÷]$/.test(expression);
+  }
 
-  // 四個運算符號
-  const OPERATORS = ["+", "−", "×", "÷"];
-
-  // ===== 更新畫面 =====
-  function updateDisplay(resultText) {
+  // 更新畫面：上方顯示算式，下方顯示目前輸入的數字或結果
+  function updateScreen(resultText) {
     expressionEl.textContent = expression;
-    if (resultText !== undefined) {
-      resultEl.textContent = resultText;
-    }
+    resultEl.textContent = resultText;
   }
 
-  // ===== 處理按下數字、小數點或運算符號 =====
-  function inputValue(value) {
-    const lastChar = expression.slice(-1);
-    const isOperator = OPERATORS.includes(value);
-
-    // 剛算完答案時：
+  // ===== 按下數字 =====
+  function pressNumber(n) {
+    // 剛算完又按數字，就重新開始新的算式
     if (justCalculated) {
+      expression = "";
       justCalculated = false;
-      if (isOperator) {
-        // 按運算符號 → 接著用上次的結果繼續算
-        const lastResult = resultEl.textContent;
-        expression = (lastResult === "錯誤" ? "0" : lastResult);
-      } else {
-        // 按數字 → 開始新的算式
-        expression = "";
-      }
     }
-
-    if (isOperator) {
-      if (expression === "") {
-        // 算式開頭只允許「−」（負數），其他符號前面補 0
-        expression = (value === "−") ? "−" : "0" + value;
-      } else if (OPERATORS.includes(lastChar)) {
-        // 連按兩個運算符號 → 用新的取代舊的
-        expression = expression.slice(0, -1) + value;
-      } else {
-        expression += value;
-      }
-    } else if (value === ".") {
-      // 找出目前這個數字（最後一個運算符號之後的部分）
-      const parts = expression.split(/[+−×÷]/);
-      const currentNumber = parts[parts.length - 1];
-      if (currentNumber.includes(".")) return;   // 同一個數字只能有一個小數點
-      // 小數點前面沒有數字就自動補 0，例如 ".5" 變成 "0.5"
-      expression += (currentNumber === "") ? "0." : ".";
-    } else {
-      // 一般數字直接接在後面
-      expression += value;
-    }
-
-    updateDisplay();
-  }
-
-  // ===== 把算式字串切成「數字」和「符號」的陣列 =====
-  // 例如 "12+3×4" → [12, "+", 3, "×", 4]
-  function tokenize(text) {
-    const tokens = [];
-    let numberText = "";
-    for (let i = 0; i < text.length; i++) {
-      const ch = text[i];
-      // 「−」出現在開頭或運算符號後面時，當作負號
-      const isNegativeSign = ch === "−" &&
-        (i === 0 || OPERATORS.includes(text[i - 1])) && numberText === "";
-      if (OPERATORS.includes(ch) && !isNegativeSign) {
-        tokens.push(parseFloat(numberText));
-        tokens.push(ch);
-        numberText = "";
-      } else {
-        numberText += (ch === "−") ? "-" : ch;
-      }
-    }
-    tokens.push(parseFloat(numberText));
-    return tokens;
-  }
-
-  // ===== 計算：先乘除、後加減（不使用 eval，比較安全） =====
-  function calculate(text) {
-    const tokens = tokenize(text);
-
-    // 第一輪：處理乘法和除法
-    const stack = [tokens[0]];
-    for (let i = 1; i < tokens.length; i += 2) {
-      const op = tokens[i];
-      const num = tokens[i + 1];
-      if (op === "×") {
-        stack.push(stack.pop() * num);
-      } else if (op === "÷") {
-        if (num === 0) throw new Error("不能除以 0");
-        stack.push(stack.pop() / num);
-      } else {
-        stack.push(op, num);   // 加減先留著
-      }
-    }
-
-    // 第二輪：由左到右處理加法和減法
-    let total = stack[0];
-    for (let i = 1; i < stack.length; i += 2) {
-      total = (stack[i] === "+") ? total + stack[i + 1] : total - stack[i + 1];
-    }
-
-    // 修正小數誤差，例如 0.1+0.2 會顯示 0.3 而不是 0.30000000000000004
-    return parseFloat(total.toFixed(10));
-  }
-
-  // ===== 按下「=」 =====
-  function pressEqual() {
-    if (expression === "") return;
-    // 算式最後是運算符號時，先拿掉它
-    if (OPERATORS.includes(expression.slice(-1))) {
+    // 避免出現 "05" 這種開頭多餘的 0
+    if (/(^|[＋－×÷])0$/.test(expression)) {
       expression = expression.slice(0, -1);
     }
-    try {
-      const answer = calculate(expression);
-      if (isNaN(answer)) throw new Error("算式不完整");
-      expression += " =";
-      updateDisplay(String(answer).replace("-", "−"));
-    } catch (err) {
-      expression += " =";
-      updateDisplay("錯誤");
-      expressionEl.textContent = expression + "（" + err.message + "）";
+    expression += n;
+    // 結果區顯示「目前正在輸入的那個數字」
+    const currentNumber = expression.split(/[＋－×÷]/).pop();
+    updateScreen(currentNumber);
+  }
+
+  // ===== 按下運算符號 =====
+  function pressOperator(op) {
+    // 算式是空的就不處理
+    if (expression === "") return;
+    // 剛算完按運算符號：接著用上一次的結果繼續算（expression 已是結果）
+    justCalculated = false;
+    // 連按兩次運算符號：後一個取代前一個
+    if (endsWithOperator()) {
+      expression = expression.slice(0, -1);
     }
+    expression += op;
+    updateScreen(op);
+  }
+
+  // ===== 清除 =====
+  function clearAll() {
+    expression = "";
+    justCalculated = false;
+    updateScreen("0");
+  }
+
+  // ===== 計算（先乘除、後加減）=====
+  function calculate() {
+    if (expression === "") return;
+    // 結尾是運算符號就先拿掉，例如 "5＋" 變成 "5"
+    if (endsWithOperator()) {
+      expression = expression.slice(0, -1);
+    }
+
+    // 1. 把算式拆成「數字」與「符號」的陣列
+    const parts = expression.split(/([＋－×÷])/);  // 例如 ["12","＋","3","×","4"]
+    const nums = [];  // 數字
+    const ops = [];   // 符號
+    parts.forEach(function (p, i) {
+      if (i % 2 === 0) nums.push(Number(p));
+      else ops.push(p);
+    });
+
+    // 2. 第一輪：先處理乘法和除法
+    for (let i = 0; i < ops.length; ) {
+      if (ops[i] === "×" || ops[i] === "÷") {
+        if (ops[i] === "÷" && nums[i + 1] === 0) {
+          // 除以 0 顯示錯誤訊息
+          expressionEl.textContent = expression + " =";
+          resultEl.textContent = "不能除以 0";
+          expression = "";
+          justCalculated = true;
+          return;
+        }
+        const value = ops[i] === "×" ? nums[i] * nums[i + 1] : nums[i] / nums[i + 1];
+        nums.splice(i, 2, value); // 用計算結果取代這兩個數字
+        ops.splice(i, 1);         // 移除已處理的符號
+      } else {
+        i++;
+      }
+    }
+
+    // 3. 第二輪：由左到右處理加法和減法
+    let total = nums[0];
+    for (let i = 0; i < ops.length; i++) {
+      total = ops[i] === "＋" ? total + nums[i + 1] : total - nums[i + 1];
+    }
+
+    // 4. 修正小數誤差（例如 0.1+0.2），最多保留 10 位小數
+    total = Math.round(total * 1e10) / 1e10;
+
+    // 5. 把這次的算式和結果存進歷史紀錄（除以 0 的錯誤不會走到這裡，所以不會被記錄）
+    addHistory(expression, total);
+
+    // 6. 顯示結果；算式變成結果，方便接著繼續計算
+    expressionEl.textContent = expression + " =";
+    resultEl.textContent = total;
+    expression = String(total);
     justCalculated = true;
   }
 
-  // ===== 按下「清除」 =====
-  function pressClear() {
-    expression = "";
-    justCalculated = false;
-    updateDisplay("0");
+  // ==================================================
+  //  計算歷史紀錄（最多保留 10 筆）
+  // ==================================================
+
+  const MAX_HISTORY = 10;   // 最多保留幾筆
+  let historyData = [];     // 每一筆長這樣：{ expr: "12＋3×4", result: 24 }
+  const historyListEl = document.getElementById("historyList");
+
+  // 新增一筆紀錄：放在最前面，超過 10 筆就丟掉最舊的
+  function addHistory(expr, result) {
+    historyData.unshift({ expr: expr, result: result });
+    if (historyData.length > MAX_HISTORY) {
+      historyData.pop();    // 移除最後面（最舊）的一筆
+    }
+    renderHistory();
   }
 
-  // ===== 幫計算機頁的按鈕綁定點擊事件（只選計算機頁裡的按鈕） =====
-  document.querySelectorAll("#calcPage button").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      const action = btn.dataset.action;
-      if (action === "clear") pressClear();
-      else if (action === "equal") pressEqual();
-      else inputValue(btn.dataset.value);
+  // 清除所有紀錄
+  function clearHistory() {
+    historyData = [];
+    renderHistory();
+  }
+
+  // 把 historyData 畫到畫面上的列表
+  function renderHistory() {
+    // 沒有紀錄時，顯示提示文字
+    if (historyData.length === 0) {
+      historyListEl.innerHTML = '<li class="history-empty">還沒有計算紀錄</li>';
+      return;
+    }
+    let html = "";
+    historyData.forEach(function (h) {
+      html += '<li class="history-item">' +
+                '<div class="history-expr">' + h.expr + ' =</div>' +
+                '<div class="history-result">' + h.result + '</div>' +
+              '</li>';
     });
-  });
+    historyListEl.innerHTML = html;
+  }
 
-  // ===== 鍵盤操作：只在「計算機」分頁時才有作用 =====
-  document.addEventListener("keydown", function (e) {
-    if (currentPage !== "calcPage") return;   // 在換算頁打字時不要干擾輸入框
-    const keyMap = { "+": "+", "-": "−", "*": "×", "/": "÷", ".": "." };
-    if (e.key >= "0" && e.key <= "9") inputValue(e.key);
-    else if (keyMap[e.key]) inputValue(keyMap[e.key]);
-    else if (e.key === "Enter" || e.key === "=") pressEqual();
-    else if (e.key === "Escape" || e.key === "Backspace") pressClear();
-  });
+  // 一開始先畫出「還沒有計算紀錄」
+  renderHistory();
 
-  /* =====================================================
-     第三部分：單位換算（數值依照「台灣常用換算表」）
-     做法：每一類先選一個「基準單位」，
-           每個單位記錄「1 單位 = 多少基準單位」，
-           換算時：數值 × 換算前倍率 ÷ 換算後倍率
-     ===================================================== */
-  const UNITS = {
-    // 重量：基準單位是「公克」
+  // ==================================================
+  //  分頁二：單位換算（資料來自「台灣常用換算表」）
+  // ==================================================
+
+  // 每個單位的 v 是「1 個該單位 = 多少基準單位」
+  //   重量基準：公克；面積基準：平方公尺；匯率基準：新台幣
+  // def 是切換類別時預設選的「換算前／換算後」單位位置
+  const UNIT_DATA = {
     weight: {
-      note: "1 台斤 = 600 公克 = 16 台兩",
-      list: {
-        "公克": 1,
-        "公斤": 1000,
-        "台斤": 600,
-        "台兩": 37.5
-      },
-      defaultFrom: "台斤",
-      defaultTo: "公克"
+      list: [
+        { name: "公克",     v: 1 },
+        { name: "公斤",     v: 1000 },
+        { name: "台斤",     v: 600 },   // 1 台斤 = 600 公克
+        { name: "台兩",     v: 37.5 }   // 1 台兩 = 37.5 公克
+      ],
+      def: [2, 0]   // 預設：台斤 → 公克
     },
-    // 面積：基準單位是「平方公尺」
     area: {
-      note: "1 坪 = 3.3058 平方公尺；1 甲 = 10 分地",
-      list: {
-        "平方公尺": 1,
-        "坪": 3.3058,
-        "分地": 969.917,
-        "甲": 9699.17
-      },
-      defaultFrom: "坪",
-      defaultTo: "平方公尺"
+      list: [
+        { name: "平方公尺", v: 1 },
+        { name: "坪",       v: 3.3058 },   // 1 坪 = 3.3058 平方公尺
+        { name: "分地",     v: 969.917 },  // 1 分地 = 969.917 平方公尺
+        { name: "甲",       v: 9699.17 }   // 1 甲 = 9699.17 平方公尺（10 分地）
+      ],
+      def: [1, 0]   // 預設：坪 → 平方公尺
     },
-    // 匯率：基準單位是「新台幣」（練習用示範數值，不是即時匯率）
-    currency: {
-      note: "※ 匯率為練習用示範數值，非即時匯率",
-      list: {
-        "新台幣 TWD": 1,
-        "美元 USD": 32.0,
-        "日圓 JPY": 0.21,
-        "歐元 EUR": 35.0,
-        "人民幣 CNY": 4.4
-      },
-      defaultFrom: "美元 USD",
-      defaultTo: "新台幣 TWD"
+    money: {
+      list: [
+        { name: "新台幣 TWD", v: 1 },
+        { name: "美元 USD",   v: 32.0 },   // 練習用示範匯率
+        { name: "日圓 JPY",   v: 0.21 },
+        { name: "歐元 EUR",   v: 35.0 },
+        { name: "人民幣 CNY", v: 4.4 }
+      ],
+      def: [1, 0]   // 預設：美元 → 新台幣
     }
   };
 
-  // 取得換算頁的元素
-  const amountInput = document.getElementById("amount");
-  const fromSelect = document.getElementById("fromUnit");
-  const toSelect = document.getElementById("toUnit");
-  const convertBefore = document.getElementById("convertBefore");
-  const convertAfter = document.getElementById("convertAfter");
-  const convertNote = document.getElementById("convertNote");
+  let currentCategory = "weight";  // 目前選擇的換算類別
 
-  let currentCategory = "weight";   // 目前選的類別
+  const amountEl   = document.getElementById("amount");
+  const fromEl     = document.getElementById("fromUnit");
+  const toEl       = document.getElementById("toUnit");
 
-  // ===== 四捨五入到小數點後 2 位（規則要求） =====
-  // 用 "e2" 的寫法可以避免 1.005 這類小數誤差算錯
-  function round2(num) {
-    return Number(Math.round(num + "e2") + "e-2");
-  }
+  // ===== 切換換算類別：重新填入下拉選單的單位 =====
+  function setCategory(cat) {
+    currentCategory = cat;
 
-  // ===== 數字格式：加千分位逗號，並固定顯示 2 位小數 =====
-  function formatNumber(num) {
-    return num.toLocaleString("zh-TW", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+    // 更新三個類別按鈕的選取狀態
+    ["weight", "area", "money"].forEach(function (c) {
+      document.getElementById("cat-" + c).classList.toggle("active", c === cat);
     });
-  }
 
-  // ===== 依照類別，把單位放進兩個下拉選單 =====
-  function loadUnits(category) {
-    const info = UNITS[category];
-    fromSelect.innerHTML = "";
-    toSelect.innerHTML = "";
-    Object.keys(info.list).forEach(function (name) {
-      fromSelect.add(new Option(name, name));
-      toSelect.add(new Option(name, name));
+    // 重新建立「換算前／換算後」兩個下拉選單的選項
+    const data = UNIT_DATA[cat];
+    let html = "";
+    data.list.forEach(function (u, i) {
+      html += '<option value="' + i + '">' + u.name + "</option>";
     });
-    fromSelect.value = info.defaultFrom;
-    toSelect.value = info.defaultTo;
-    convertNote.textContent = info.note;
-    doConvert();
+    fromEl.innerHTML = html;
+    toEl.innerHTML = html;
+    fromEl.value = data.def[0];
+    toEl.value = data.def[1];
+
+    // 只有匯率類別才顯示「練習用匯率」提醒
+    document.getElementById("rateNote").classList.toggle("hidden", cat !== "money");
+
+    convert();
   }
 
-  // ===== 執行換算 =====
-  function doConvert() {
-    const value = parseFloat(amountInput.value);
-    const fromName = fromSelect.value;
-    const toName = toSelect.value;
+  // ===== 互換「換算前」與「換算後」的單位 =====
+  function swapUnits() {
+    const temp = fromEl.value;
+    fromEl.value = toEl.value;
+    toEl.value = temp;
+    convert();
+  }
 
-    // 沒有輸入或輸入不是數字時，給提示
-    if (isNaN(value)) {
-      convertBefore.textContent = "請輸入數值";
-      convertAfter.textContent = "";
+  // ===== 進行換算並更新畫面 =====
+  function convert() {
+    const list = UNIT_DATA[currentCategory].list;
+    const from = list[Number(fromEl.value)];
+    const to   = list[Number(toEl.value)];
+
+    // 單位名稱：換算前與換算後都要顯示
+    document.getElementById("beforeUnit").textContent = from.name;
+    document.getElementById("afterUnit").textContent  = to.name;
+
+    // 沒輸入（或輸入不是數字）時，提示使用者
+    const raw = amountEl.value;
+    if (raw === "" || isNaN(Number(raw))) {
+      document.getElementById("beforeValue").textContent = "－";
+      document.getElementById("afterValue").textContent  = "請輸入數字";
       return;
     }
+    const amount = Number(raw);
 
-    const list = UNITS[currentCategory].list;
-    // 先換成基準單位，再換成目標單位
-    const answer = round2(value * list[fromName] / list[toName]);
+    // 換算公式：先換成基準單位，再換成目標單位
+    const result = amount * from.v / to.v;
 
-    // 同時顯示「換算前」與「換算後」的單位名稱
-    convertBefore.textContent = formatNumber(value) + " " + fromName;
-    convertAfter.textContent = "= " + formatNumber(answer) + " " + toName;
+    // 規則：結果四捨五入到小數點後 2 位
+    const rounded = Math.round((result + Number.EPSILON) * 100) / 100;
+
+    // 加上千分位逗號，並固定顯示 2 位小數
+    document.getElementById("beforeValue").textContent =
+      amount.toLocaleString("zh-TW", { maximumFractionDigits: 10 });
+    document.getElementById("afterValue").textContent =
+      rounded.toLocaleString("zh-TW", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
-  // ===== 類別按鈕：切換重量／面積／匯率 =====
-  document.querySelectorAll(".category").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      document.querySelectorAll(".category").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentCategory = btn.dataset.category;
-      loadUnits(currentCategory);
-    });
-  });
-
-  // ===== 對調「換算前」和「換算後」的單位 =====
-  document.getElementById("swapBtn").addEventListener("click", function () {
-    const temp = fromSelect.value;
-    fromSelect.value = toSelect.value;
-    toSelect.value = temp;
-    doConvert();
-  });
-
-  // ===== 按「換算」按鈕，或修改數值／單位時，自動重新計算 =====
-  document.getElementById("convertBtn").addEventListener("click", doConvert);
-  amountInput.addEventListener("input", doConvert);
-  fromSelect.addEventListener("change", doConvert);
-  toSelect.addEventListener("change", doConvert);
-
-  // 一開啟頁面先載入「重量」類別
-  loadUnits("weight");
-
-  /* =====================================================
-     第四部分：聚餐分帳
-     公式：應付總額 = 總金額 ×（加服務費就乘 1.1）
-           每人金額 = 應付總額 ÷ 人數，再無條件進位到元
-     ===================================================== */
-  const billInput = document.getElementById("billTotal");
-  const peopleInput = document.getElementById("peopleCount");
-  const serviceCheck = document.getElementById("serviceFee");
-  const subtotalText = document.getElementById("subtotalText");
-  const feeText = document.getElementById("feeText");
-  const grandText = document.getElementById("grandText");
-  const perPersonEl = document.getElementById("perPerson");
-  const splitNote = document.getElementById("splitNote");
-
-  // 金額格式：加千分位，最多顯示 2 位小數，前面加「$」
-  function formatMoney(num) {
-    return "$" + num.toLocaleString("zh-TW", { maximumFractionDigits: 2 });
-  }
-
-  // ===== 計算分帳 =====
-  function doSplit() {
-    const total = parseFloat(billInput.value);
-    const people = Number(peopleInput.value);
-
-    // 檢查輸入：金額要是 0 以上的數字，人數要是 1 以上的整數
-    if (isNaN(total) || total < 0) {
-      perPersonEl.textContent = "請輸入總金額";
-      return;
-    }
-    if (!Number.isInteger(people) || people < 1) {
-      perPersonEl.textContent = "人數要是正整數";
-      return;
-    }
-
-    // 服務費 = 總金額的 10%（沒勾就是 0），用 round2 避免小數誤差
-    const fee = serviceCheck.checked ? round2(total * 0.1) : 0;
-    const grand = round2(total + fee);
-
-    // 無條件進位：Math.ceil
-    // 減掉一個極小值，是為了避免電腦小數誤差（例如 275.00000000001）被多進位 1 元
-    const perPerson = Math.ceil(grand / people - 1e-9);
-
-    // 顯示明細
-    subtotalText.textContent = formatMoney(total);
-    feeText.textContent = serviceCheck.checked ? formatMoney(fee) : "不加";
-    grandText.textContent = formatMoney(grand);
-    perPersonEl.textContent = formatMoney(perPerson) + " 元";
-
-    // 因為進位，大家合計可能比總額多一點，提醒一下多出多少
-    const extra = round2(perPerson * people - grand);
-    splitNote.textContent = extra > 0
-      ? "每人金額無條件進位到元，合計 " + formatMoney(perPerson * people) + "，比總額多 " + formatMoney(extra)
-      : "每人金額無條件進位到元，剛好整除";
-  }
-
-  // 按按鈕、改輸入、勾選服務費時，都自動重新計算
-  document.getElementById("splitBtn").addEventListener("click", doSplit);
-  billInput.addEventListener("input", doSplit);
-  peopleInput.addEventListener("input", doSplit);
-  serviceCheck.addEventListener("change", doSplit);
+  // 一開始先載入「重量」類別
+  setCategory("weight");
 </script>
 
 </body>
