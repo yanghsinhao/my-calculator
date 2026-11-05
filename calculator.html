@@ -478,6 +478,7 @@
   // ===== 按下「=」 =====
   function pressEqual() {
     if (expression === "") return;
+    if (justCalculated) return;   // 剛算完再按一次不重複計算，避免出現「8 = = 8」
     // 算式最後是運算符號時，先拿掉它
     if (OPERATORS.includes(expression.slice(-1))) {
       expression = expression.slice(0, -1);
