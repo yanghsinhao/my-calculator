@@ -1,0 +1,13 @@
+{
+  "name": "my-calculator",
+  "private": true,
+  "description": "my-calculator 的自動驗證流程",
+  "scripts": {
+    "preflight": "node scripts/preflight.js",
+    "test": "node tests/calculator.test.js",
+    "verify": "node scripts/verify.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
